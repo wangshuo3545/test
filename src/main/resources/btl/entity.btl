@@ -1,0 +1,112 @@
+package ${entity.entityPackage};
+
+import cn.exrick.xboot.base.XbootBaseEntity;
+import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+<%
+if(entity.activiti&&!entity.isTree){
+%>
+import import javax.persistence.Transient;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
+<%
+}
+%>
+<%
+if(entity.isTree){
+%>
+import import javax.persistence.Transient;
+import com.baomidou.mybatisplus.annotation.TableField;
+
+import javax.persistence.Column;
+import java.math.BigDecimal;
+<%
+}
+%>
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+/**
+ * @author ${entity.author}
+ */
+@Data
+@Accessors(chain = true)
+@Entity
+@DynamicInsert
+@DynamicUpdate
+@Table(name = "${entity.tableName}")
+@TableName("${entity.tableName}")
+@Schema(description = "${entity.description}")
+public class ${entity.className} extends XbootBaseEntity {
+
+    private static final long serialVersionUID = 1L;
+
+    <%
+    if(entity.activiti&&!entity.isTree){
+    %>
+    @Schema(description = "关联流程申请表id")
+    private String actBusinessId;
+
+    @Transient
+    @TableField(exist = false)
+    @Schema(description = "申请用户")
+    private String applyUser;
+
+    @Transient
+    @TableField(exist = false)
+    @Schema(description = "表单路由名")
+    private String routeName;
+
+    @Transient
+    @TableField(exist = false)
+    @Schema(description = "流程实例id")
+    private String procInstId;
+
+    @Transient
+    @TableField(exist = false)
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "提交申请时间")
+    private Date applyTime;
+
+    @Transient
+    @TableField(exist = false)
+    @Schema(description = "状态 0草稿默认 1处理中 2结束")
+    private Integer status;
+
+    @Transient
+    @TableField(exist = false)
+    @Schema(description = "结果状态 0未提交默认 1处理中 2通过 3驳回")
+    private Integer result;
+    <%
+    }
+    %>
+    <%
+    if(entity.isTree){
+    %>
+    @Schema(description = "名称")
+    private String title;
+
+    @Schema(description = "父id")
+    @Column(nullable = false)
+    private String parentId;
+
+    @Schema(description = "是否为父节点(含子节点) 默认false")
+    private Boolean isParent = false;
+
+    @Schema(description = "排序值")
+    @Column(precision = 10, scale = 2)
+    private BigDecimal sortOrder;
+
+    @Transient
+    @TableField(exist = false)
+    @Schema(description = "父节点名称")
+    private String parentTitle;
+    <%
+    }
+    %>
+}
